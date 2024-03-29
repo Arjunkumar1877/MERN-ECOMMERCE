@@ -12,6 +12,7 @@
   "dependencies": {
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "react-icons": "^5.0.1",
     "react-router-dom": "^6.22.3"
   },
   "devDependencies": {
@@ -23,14 +24,5 @@
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-react-refresh": "^0.4.6",
     "vite": "^5.2.0"
-  },
-  {
-    "env": {},
-    "rules": {},
-    "parserOptions": {
-        "ecmaFeatures": {},
-        "ecmaVersion": "latest",
-        "sourceType": "module"
-    }
-}
+  }
 }

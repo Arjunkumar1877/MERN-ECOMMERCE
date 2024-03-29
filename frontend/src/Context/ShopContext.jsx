@@ -1,5 +1,6 @@
 import { createContext, useState } from "react";
-import all_product from '../Components/Assets/all_product'
+import all_product from '../Components/Assets/all_product';
+import { useSyncExternalStore } from "react";
 
 export const ShopContext = createContext(null);
 const getDefaultCart = ()=>{
@@ -11,6 +12,7 @@ const getDefaultCart = ()=>{
     return cart;
 }
 
+
 const ShopContextProvider = (props) => {
   const [cartItems, setCartItems] = useState(getDefaultCart());
  
@@ -21,7 +23,7 @@ const ShopContextProvider = (props) => {
 
   const removeFromCart = (itemId)=>{
     setCartItems((prev)=>({...prev, [itemId]:prev[itemId]-1}))
-     }
+  }
 
   const getTotalCartAmount = ()=>{
         let totalAmount = 0;
@@ -34,7 +36,7 @@ const ShopContextProvider = (props) => {
 
         return totalAmount;
 
-    }
+  }
 
   const getTotalCartItems = ()=>{
     let totalItem = 0;
@@ -46,13 +48,13 @@ const ShopContextProvider = (props) => {
     return totalItem
   }
 //   console.log(cartItems)
-    const contextValue = {all_product, cartItems, addToCart, removeFromCart, getTotalCartAmount, getTotalCartItems};
+  const contextValue = {all_product, cartItems, addToCart, removeFromCart, getTotalCartAmount, getTotalCartItems};
 
-    return (
+  return (
         <ShopContext.Provider value={contextValue}>
            {props.children}
         </ShopContext.Provider>
-    )
+   )
 }
 
 export default ShopContextProvider;
