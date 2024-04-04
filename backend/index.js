@@ -41,27 +41,52 @@ app.post('/upload',upload.single('product'), async(req,res)=>{
     success: 1,
     image_url: `http://localhost:${port}/images/${req.file.filename}`
   })
-})
+});
 
 app.post('/add-product', async(req,res)=>{
     try {
+       let products = await Products.find({});
+       let id;
+       if(products.length > 0){
+        let last_product_array = products.slice(-1);
+        let last_product = last_product_array[0];
+        id = last_product.id + 1;
+       }else{
+        id = 1;
+       }
         const product = new Products({
-             id:1,
-  name:"arjun",
-  image:"fgdddgfd",
-  category:"gdgfdgjk",
-  new_price:23,
-  old_price:54,
-       })
+            id: id,
+            name: req.body.name,
+            image: req.body.image,
+            category: req.body.category,
+            new_price: req.body.new_price,
+            old_price: req.body.old_price
+        });
 
+        console.log(product)
       const saved = await product.save()
 
-      res.json(saved)
+      res.json({sucess: true, name: req.body.name})
     } catch (error) {
         console.log(error.message)
     }
+});
+
+app.post('/removeproduct', async(req, res)=>{
+    await Products.findOneAndDelete({id: req.body.id});
+    console.log("Removed");
+    res.json({
+        success: true,
+        name: req.body.name
+    })
 })
 
+app.get('/allproducts', async(req, res)=>{
+    let products = await Products.find({});
+    console.log("all products fetched");
+    console.log(products)
+    res.send(products)
+})
 
 app.listen(port, ()=>{
     console.log('Server is running on port 4000!!!');

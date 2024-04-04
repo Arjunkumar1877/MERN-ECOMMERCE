@@ -1,8 +1,2 @@
+node_modules/
 .env
-/nodemodules
-
-
-node_modules
-dist
-dist-ssr
-*.local
