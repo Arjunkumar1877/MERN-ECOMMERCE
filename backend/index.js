@@ -66,7 +66,7 @@ app.post('/add-product', async(req,res)=>{
         console.log(product)
       const saved = await product.save()
 
-      res.json({sucess: true, name: req.body.name})
+      res.json({success: true, name: req.body.name})
     } catch (error) {
         console.log(error.message)
     }
