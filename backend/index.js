@@ -73,7 +73,7 @@ app.post('/add-product', async(req,res)=>{
 });
 
 app.post('/removeproduct', async(req, res)=>{
-    await Products.findOneAndDelete({id: req.body.id});
+    await Products.findOneAndDelete({_id: req.body.id});
     console.log("Removed");
     res.json({
         success: true,
