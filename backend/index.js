@@ -7,6 +7,8 @@ import path from 'path';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import { Products } from './models/productSchema.js';
+import User from './models/userSchema.js';
+import { error } from 'console';
 dotenv.config();
 
 const app = express();
@@ -86,6 +88,91 @@ app.get('/allproducts', async(req, res)=>{
     console.log("all products fetched");
     console.log(products)
     res.send(products)
+})
+
+app.post('/signup', async(req, res)=>{
+try {
+
+    console.log(req.body)
+    let check = await User.findOne({email: req.body.email});
+
+    if(check){
+        return res.status(400).json({success: false, error: "existing user found with same email Id !"});
+    }
+    let cart = {};
+    for (let i = 0; i < 300; i++) {
+        cart[i] = 0;        
+    }
+
+    const user = new User({
+        name: req.body.username,
+        email: req.body.email,
+        password: req.body.password,
+        cartdata: cart
+    })
+
+    await user.save();
+
+    const data = {
+        user: {
+            id: user.id
+        }
+    }
+
+    const token = jwt.sign(data, 'secret_ecommerce');
+
+    res.json({success: true, token});
+} catch (error) {
+    console.log(error.message)
+}
+})
+
+app.post('/login', async(req, res)=>{
+    let user = await User.findOne({email: req.body.email});
+
+    if(user){
+        let passVerify = req.body.password === user.password;
+
+        if(passVerify){
+            const data = {
+                user: {
+                    id: user.id
+                }
+            }
+
+            const token = jwt.sign(data, 'secret_ecommerce');
+
+            res.status(200).json({success: true, token})
+        }else{
+            res.status(400).json({success: false, error: "Wrong password !"});
+        }
+    }else{
+        res.status(400).json({success: false, error: "Wrong email id"});
+    }
+})
+
+
+app.get('/newcollections', async(req,res)=>{
+    try {
+        let product = await Products.find({});
+        let newCollection = product.slice(1).slice(-8);
+        console.log("New Collection fetched");
+
+        res.json(newCollection)
+    } catch (error) {
+        console.log(error.message)
+    }
+})
+
+app.get('/popularinwomen', async(req,res)=>{
+   try {
+    let products = await Products.find({category: "women"});
+    let popular_in_women = products.slice(0, 4);
+    console.log("Popular in women fetched");
+    res.json(popular_in_women)
+   } catch (error) {
+    console.log(error.message)
+   }
 })
 
 app.listen(port, ()=>{
