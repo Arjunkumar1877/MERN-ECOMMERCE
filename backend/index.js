@@ -108,7 +108,7 @@ try {
         name: req.body.username,
         email: req.body.email,
         password: req.body.password,
-        cartdata: cart
+        cartData: cart
     })
 
     await user.save();
@@ -151,8 +151,7 @@ app.post('/login', async(req, res)=>{
     }
 })
 
-
-app.get('/newcollections', async(req,res)=>{
+app.get('/newcollections', async(req, res)=>{
     try {
         let product = await Products.find({});
         let newCollection = product.slice(1).slice(-8);
@@ -164,7 +163,7 @@ app.get('/newcollections', async(req,res)=>{
     }
 })
 
-app.get('/popularinwomen', async(req,res)=>{
+app.get('/popularinwomen', async(req, res)=>{
    try {
     let products = await Products.find({category: "women"});
     let popular_in_women = products.slice(0, 4);
@@ -173,6 +172,63 @@ app.get('/popularinwomen', async(req,res)=>{
    } catch (error) {
     console.log(error.message)
    }
+})
+
+const fetchUser = async(req, res, next)=>{
+   try {
+    const token = req.header('auth-token');
+    if(!token){
+        res.status(401).send({error: "Please authenticate using valid token."})
+    }else{
+        try {
+            const data = jwt.verify(token, 'secret_ecommerce');
+            req.user = data.user;
+            next();
+        } catch (error) {
+            res.status(401).send({errors: "Please authenticate using a valid token"});
+        }
+    }
+   } catch (error) {
+    console.log(error.message)
+   }
+}
+
+
+app.post('/addtocart',fetchUser, async(req, res)=>{
+   try {
+    console.log("Added", req.body.itemId);
+
+    let userData = await User.findOne({_id: req.user.id});
+    userData.cartData[req.body.itemId] += 1;
+   // console.log(userData.cartData)
+    const updated  = await User.findOneAndUpdate({_id: req.user.id}, {cartData: userData.cartData});
+    if(updated){
+        res.send("Added to cart");
+    }else{
+        console.log("Failed updating cart");
+    }
+   } catch (error) {
+    console.log(error.message)
+   }
+})
+
+app.post('/removefromcart', fetchUser, async(req, res)=>{
+    try {
+        console.log("Removed", req.body.itemId);
+        let userData = await User.findOne({_id: req.user.id});
+        if(userData.cartData[req.body.itemId] > 0){
+            userData.cartData[req.body.itemId] -= 1;
+        }
+     const updated =  await User.findOneAndUpdate({_id: req.user.id}, {cartData: userData.cartData});
+
+     if(updated){
+  res.send(removed);
+     }else{
+        console.log("Failed tto remove product from the cart");
+     }
+    } catch (error) {
+        console.log(error.data)
+    }
 })
 
 app.listen(port, ()=>{
